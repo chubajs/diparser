@@ -19,6 +19,7 @@ interface Transcript {
 
 interface ArchiveItem {
   id: string;
+  name: string;
   fileName: string;
   transcriptionDate: string;
   transcript: Transcript;
@@ -60,8 +61,11 @@ export default function Home() {
       setTranscription(data.transcript.utterances);
       setCurrentCost(data.cost);
 
+      const transcriptionName = prompt('Enter a name for this transcription:', file.name);
+      
       const newItem: ArchiveItem = {
         id: Date.now().toString(),
+        name: transcriptionName || file.name,
         fileName: file.name,
         transcriptionDate: new Date().toLocaleString(),
         transcript: data.transcript,
@@ -88,6 +92,14 @@ export default function Home() {
     }
   };
 
+  const handleArchiveItemNameChange = (id: string, newName: string) => {
+    const updatedItems = archiveItems.map(item =>
+      item.id === id ? { ...item, name: newName } : item
+    );
+    setArchiveItems(updatedItems);
+    localStorage.setItem('archiveItems', JSON.stringify(updatedItems));
+  };
+
   return (
     <main className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -109,7 +121,11 @@ export default function Home() {
           </div>
         </div>
         <TranscriptionDisplay transcription={transcription} />
-        <Archive items={archiveItems} onItemSelect={handleArchiveItemSelect} />
+        <Archive
+          items={archiveItems}
+          onItemSelect={handleArchiveItemSelect}
+          onItemNameChange={handleArchiveItemNameChange}
+        />
       </div>
     </main>
   );

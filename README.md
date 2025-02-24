@@ -7,8 +7,10 @@ This is a Next.js application that transcribes audio files using AssemblyAI and 
 - Upload audio files (MP3, OGG, M4A)
 - Transcribe audio using AssemblyAI with real-time progress updates
 - Display transcriptions with speaker labels and timestamps in a user-friendly format
-- Archive previous transcriptions for easy access
+- Archive previous transcriptions with custom names for easy access
+- Edit transcription names directly from the archive page
 - Show transcription cost for each processed file
+- Persistent storage of transcriptions between sessions
 - Responsive and visually appealing user interface
 
 ## Prerequisites
@@ -70,9 +72,12 @@ The main files and directories in this project are:
 
 1. Drag and drop an audio file or click to select a file for upload.
 2. Watch the progress bar as the file is transcribed.
-3. View the transcription with speaker labels and timestamps in a clean, easy-to-read format.
-4. See the transcription cost for the processed file.
-5. Access previous transcriptions from the archive by clicking on the file name.
+3. Enter a custom name for the transcription when prompted.
+4. View the transcription with speaker labels and timestamps in a clean, easy-to-read format.
+5. See the transcription cost for the processed file.
+6. Access previous transcriptions from the archive by clicking on the transcription name.
+7. Edit transcription names by clicking the "Edit" button next to each archive item.
+8. Transcriptions are automatically saved and will persist between browser sessions.
 
 ## Troubleshooting
 
