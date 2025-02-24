@@ -26,14 +26,33 @@ interface TranscriptResult {
   audio_duration: number;
 }
 
+const languageToModel: { [key: string]: string } = {
+  en: 'en_us',
+  es: 'es',
+  fr: 'fr',
+  de: 'de',
+  it: 'it',
+  pt: 'pt',
+  nl: 'nl',
+  ja: 'ja',
+  zh: 'zh',
+  ru: 'ru',
+};
+
 export async function POST(request: Request) {
   console.log('Transcription request received');
   const formData = await request.formData();
   const file = formData.get('file') as File;
+  const language = formData.get('language') as string;
 
   if (!file) {
     console.log('No file uploaded');
     return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+  }
+
+  if (!language || !languageToModel[language]) {
+    console.log('Invalid language');
+    return NextResponse.json({ error: 'Invalid language' }, { status: 400 });
   }
 
   try {
@@ -47,42 +66,42 @@ export async function POST(request: Request) {
     console.log('Starting transcription');
     const params = {
       audio_url: uploadResponse,
+      language_code: languageToModel[language],
       speaker_labels: true,
+      speech_model: language === 'en' ? 'best' : 'nano' as 'best' | 'nano',
     };
 
-    const transcript = await client.transcripts.create(params);
-    console.log('Transcription initiated, polling for results');
+    const transcript = await client.transcripts.submit(params);
+    console.log('Transcription submitted, ID:', transcript.id);
 
-    let polledTranscript: TranscriptResult | null = null;
-    while (true) {
-      const result = await client.transcripts.get(transcript.id);
-      if (result.status === 'completed' || result.status === 'error') {
-        polledTranscript = {
-          id: result.id,
-          status: result.status,
-          text: result.text || '',
-          utterances: result.utterances || [],
-          audio_duration: result.audio_duration || 0,
-        };
-        break;
-      }
-      console.log(`Transcription status: ${result.status}`);
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // Increased polling interval
-    }
-
-    if (!polledTranscript || polledTranscript.status === 'error') {
-      throw new Error('Transcription failed');
-    }
+    console.log('Waiting for transcription to complete');
+    const polledTranscript = await client.transcripts.waitUntilReady(transcript.id, {
+      pollingInterval: 3000,
+    });
 
     console.log('Transcription completed');
 
     // Calculate the cost of transcription (assuming $0.00025 per second)
-    const durationInSeconds = polledTranscript.audio_duration;
+    const durationInSeconds = polledTranscript.audio_duration || 0;
     const cost = (durationInSeconds * 0.00025).toFixed(2);
 
     console.log('Transcription cost:', cost);
 
-    return NextResponse.json({ transcript: polledTranscript, cost });
+    // Get sentences and paragraphs
+    const sentences = await client.transcripts.sentences(transcript.id);
+    const paragraphs = await client.transcripts.paragraphs(transcript.id);
+
+    // Get subtitles
+    const srt = await client.transcripts.subtitles(transcript.id, "srt");
+    const vtt = await client.transcripts.subtitles(transcript.id, "vtt");
+
+    return NextResponse.json({
+      transcript: polledTranscript,
+      cost,
+      sentences,
+      paragraphs,
+      subtitles: { srt, vtt }
+    });
   } catch (error) {
     console.error('Transcription error:', error);
     if (error instanceof Error) {

@@ -1,18 +1,20 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface FileUploadProps {
-  onFileUpload: (file: File) => Promise<void>;
+  onFileUpload: (file: File, language: string) => Promise<void>;
   isLoading: boolean;
   progress: number;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, isLoading, progress }) => {
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0 && !isLoading) {
-      onFileUpload(acceptedFiles[0]);
+      onFileUpload(acceptedFiles[0], selectedLanguage);
     }
-  }, [onFileUpload, isLoading]);
+  }, [onFileUpload, isLoading, selectedLanguage]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -23,8 +25,38 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, isLoading, progre
     disabled: isLoading
   });
 
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'it', name: 'Italian' },
+    { code: 'pt', name: 'Portuguese' },
+    { code: 'nl', name: 'Dutch' },
+    { code: 'ja', name: 'Japanese' },
+    { code: 'zh', name: 'Chinese' },
+    { code: 'ru', name: 'Russian' },
+  ];
+
   return (
     <div className="w-full max-w-md mx-auto mt-8">
+      <div className="mb-4">
+        <label htmlFor="language-select" className="block text-sm font-medium text-gray-700">
+          Select Language
+        </label>
+        <select
+          id="language-select"
+          value={selectedLanguage}
+          onChange={(e) => setSelectedLanguage(e.target.value)}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        >
+          {languages.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div
         {...getRootProps()}
         className={`p-8 border-2 border-dashed rounded-lg text-center cursor-pointer ${

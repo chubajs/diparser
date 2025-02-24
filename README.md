@@ -6,7 +6,11 @@ This is a Next.js application that transcribes audio files using AssemblyAI and 
 
 - Upload audio files (MP3, OGG, M4A)
 - Transcribe audio using AssemblyAI with real-time progress updates
+- Support for multiple languages (English, Spanish, French, German, Italian, Portuguese, Dutch, Japanese, Chinese, Russian)
+- Automatic selection of the best transcription model based on the chosen language
 - Display transcriptions with speaker labels and timestamps in a user-friendly format
+- View transcriptions as utterances, sentences, or paragraphs
+- Download subtitles in SRT and VTT formats
 - Archive previous transcriptions with custom names for easy access
 - Edit transcription names directly from the archive page
 - Edit speaker names for all utterances by the same speaker simultaneously
@@ -71,18 +75,37 @@ The main files and directories in this project are:
 
 ## Usage
 
-1. Drag and drop an audio file or click to select a file for upload.
-2. Watch the progress bar as the file is transcribed.
-3. Enter a custom name for the transcription when prompted.
-4. View the transcription with speaker labels and timestamps in a clean, easy-to-read format.
-5. See the transcription cost for the processed file.
-6. Access previous transcriptions from the archive by clicking on the transcription name.
-7. Edit transcription names by clicking the "Edit Name" button next to each archive item.
-8. Edit speaker names by clicking the "Edit Speakers" button next to each archive item.
-   - In edit mode, you can change the speaker names for all utterances by the same speaker simultaneously.
-   - The number of utterances for each speaker is displayed next to their name.
-   - Click "Save Speaker Names" to save your changes.
-9. Transcriptions are automatically saved and will persist between browser sessions.
+1. Select the language of the audio file from the dropdown menu.
+2. Drag and drop an audio file or click to select a file for upload.
+3. Watch the progress bar as the file is transcribed.
+4. Enter a custom name for the transcription when prompted.
+5. View the transcription with speaker labels and timestamps in a clean, easy-to-read format.
+6. Toggle between utterances, sentences, and paragraphs views using the tabs above the transcription.
+7. Download subtitles in SRT or VTT format using the provided buttons.
+8. See the transcription cost for the processed file.
+9. Access previous transcriptions from the archive by clicking on the transcription name.
+10. Edit transcription names by clicking the "Edit Name" button next to each archive item.
+11. Edit speaker names by clicking the "Edit Speakers" button next to each archive item.
+    - In edit mode, you can change the speaker names for all utterances by the same speaker simultaneously.
+    - The number of utterances for each speaker is displayed next to their name.
+    - Click "Save Speaker Names" to save your changes.
+12. Transcriptions are automatically saved and will persist between browser sessions.
+
+## Supported Languages
+
+The application supports the following languages:
+- English (uses the 'best' transcription model)
+- Spanish
+- French
+- German
+- Italian
+- Portuguese
+- Dutch
+- Japanese
+- Chinese
+- Russian
+
+For languages other than English, the application uses the 'nano' transcription model.
 
 ## Troubleshooting
 

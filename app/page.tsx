@@ -15,6 +15,7 @@ interface Utterance {
 interface Transcript {
   utterances: Utterance[];
   audio_duration: number;
+  text: string;
 }
 
 interface ArchiveItem {
@@ -24,6 +25,13 @@ interface ArchiveItem {
   transcriptionDate: string;
   transcript: Transcript;
   cost: string;
+  language: string;
+  sentences: string[];
+  paragraphs: string[];
+  subtitles: {
+    srt: string;
+    vtt: string;
+  };
 }
 
 export default function Home() {
@@ -33,6 +41,7 @@ export default function Home() {
   const [currentCost, setCurrentCost] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [editingSpeakers, setEditingSpeakers] = useState<string | null>(null);
+  const [currentItem, setCurrentItem] = useState<ArchiveItem | null>(null);
 
   useEffect(() => {
     const storedItems = localStorage.getItem('archiveItems');
@@ -41,12 +50,13 @@ export default function Home() {
     }
   }, []);
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, language: string) => {
     setIsLoading(true);
     setCurrentCost(null);
     setProgress(0);
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('language', language);
 
     try {
       const response = await fetch('/api/transcribe', {
@@ -58,7 +68,14 @@ export default function Home() {
         throw new Error('Transcription failed');
       }
 
-      const data: { transcript: Transcript; cost: string } = await response.json();
+      const data: {
+        transcript: Transcript;
+        cost: string;
+        sentences: string[];
+        paragraphs: string[];
+        subtitles: { srt: string; vtt: string };
+      } = await response.json();
+
       setTranscription(data.transcript.utterances);
       setCurrentCost(data.cost);
 
@@ -71,7 +88,13 @@ export default function Home() {
         transcriptionDate: new Date().toLocaleString(),
         transcript: data.transcript,
         cost: data.cost,
+        language: language,
+        sentences: data.sentences,
+        paragraphs: data.paragraphs,
+        subtitles: data.subtitles,
       };
+
+      setCurrentItem(newItem);
 
       const updatedItems = [...archiveItems, newItem];
       setArchiveItems(updatedItems);
@@ -146,6 +169,9 @@ export default function Home() {
           transcription={transcription}
           isEditing={!!editingSpeakers}
           onSave={handleSaveSpeakers}
+          sentences={currentItem?.sentences}
+          paragraphs={currentItem?.paragraphs}
+          subtitles={currentItem?.subtitles}
         />
         <Archive
           items={archiveItems}

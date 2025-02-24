@@ -11,10 +11,24 @@ interface TranscriptionDisplayProps {
   transcription: Utterance[];
   isEditing: boolean;
   onSave: (updatedUtterances: Utterance[]) => void;
+  sentences?: string[];
+  paragraphs?: string[];
+  subtitles?: {
+    srt: string;
+    vtt: string;
+  };
 }
 
-const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({ transcription, isEditing, onSave }) => {
+const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({
+  transcription,
+  isEditing,
+  onSave,
+  sentences,
+  paragraphs,
+  subtitles,
+}) => {
   const [editedTranscription, setEditedTranscription] = useState<Utterance[]>(transcription);
+  const [activeTab, setActiveTab] = useState<'utterances' | 'sentences' | 'paragraphs'>('utterances');
 
   useEffect(() => {
     setEditedTranscription(transcription);
@@ -32,6 +46,20 @@ const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({ transcripti
 
   const handleSave = () => {
     onSave(editedTranscription);
+  };
+
+  const handleDownloadSubtitles = (format: 'srt' | 'vtt') => {
+    if (subtitles) {
+      const blob = new Blob([subtitles[format]], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `subtitles.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   };
 
   if (transcription.length === 0) {
@@ -67,8 +95,46 @@ const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({ transcripti
           </button>
         </div>
       )}
+      <div className="px-6 py-4">
+        <div className="flex mb-4">
+          <button
+            className={`mr-2 px-4 py-2 rounded ${activeTab === 'utterances' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setActiveTab('utterances')}
+          >
+            Utterances
+          </button>
+          <button
+            className={`mr-2 px-4 py-2 rounded ${activeTab === 'sentences' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setActiveTab('sentences')}
+          >
+            Sentences
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${activeTab === 'paragraphs' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setActiveTab('paragraphs')}
+          >
+            Paragraphs
+          </button>
+        </div>
+        {subtitles && (
+          <div className="mb-4">
+            <button
+              className="mr-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={() => handleDownloadSubtitles('srt')}
+            >
+              Download SRT
+            </button>
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={() => handleDownloadSubtitles('vtt')}
+            >
+              Download VTT
+            </button>
+          </div>
+        )}
+      </div>
       <div className="divide-y divide-gray-200">
-        {editedTranscription.map((utterance, index) => (
+        {activeTab === 'utterances' && editedTranscription.map((utterance, index) => (
           <div key={index} className="p-6 hover:bg-gray-50 transition-colors duration-150">
             <div className="flex items-center mb-2">
               <span className="font-semibold text-lg text-blue-600">{utterance.speaker}</span>
@@ -78,6 +144,16 @@ const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({ transcripti
               </span>
             </div>
             <p className="text-gray-700">{utterance.text}</p>
+          </div>
+        ))}
+        {activeTab === 'sentences' && sentences && sentences.map((sentence, index) => (
+          <div key={index} className="p-6 hover:bg-gray-50 transition-colors duration-150">
+            <p className="text-gray-700">{sentence}</p>
+          </div>
+        ))}
+        {activeTab === 'paragraphs' && paragraphs && paragraphs.map((paragraph, index) => (
+          <div key={index} className="p-6 hover:bg-gray-50 transition-colors duration-150">
+            <p className="text-gray-700">{paragraph}</p>
           </div>
         ))}
       </div>
