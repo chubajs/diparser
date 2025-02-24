@@ -9,6 +9,7 @@ This is a Next.js application that transcribes audio files using AssemblyAI and 
 - Display transcriptions with speaker labels and timestamps in a user-friendly format
 - Archive previous transcriptions with custom names for easy access
 - Edit transcription names directly from the archive page
+- Edit speaker names for all utterances by the same speaker simultaneously
 - Show transcription cost for each processed file
 - Persistent storage of transcriptions between sessions
 - Responsive and visually appealing user interface
@@ -76,8 +77,12 @@ The main files and directories in this project are:
 4. View the transcription with speaker labels and timestamps in a clean, easy-to-read format.
 5. See the transcription cost for the processed file.
 6. Access previous transcriptions from the archive by clicking on the transcription name.
-7. Edit transcription names by clicking the "Edit" button next to each archive item.
-8. Transcriptions are automatically saved and will persist between browser sessions.
+7. Edit transcription names by clicking the "Edit Name" button next to each archive item.
+8. Edit speaker names by clicking the "Edit Speakers" button next to each archive item.
+   - In edit mode, you can change the speaker names for all utterances by the same speaker simultaneously.
+   - The number of utterances for each speaker is displayed next to their name.
+   - Click "Save Speaker Names" to save your changes.
+9. Transcriptions are automatically saved and will persist between browser sessions.
 
 ## Troubleshooting
 

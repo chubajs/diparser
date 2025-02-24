@@ -25,9 +25,10 @@ interface ArchiveProps {
   items: ArchiveItem[];
   onItemSelect: (id: string) => void;
   onItemNameChange: (id: string, newName: string) => void;
+  onEditSpeakers: (id: string) => void;
 }
 
-const Archive: React.FC<ArchiveProps> = ({ items, onItemSelect, onItemNameChange }) => {
+const Archive: React.FC<ArchiveProps> = ({ items, onItemSelect, onItemNameChange, onEditSpeakers }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
 
@@ -78,12 +79,20 @@ const Archive: React.FC<ArchiveProps> = ({ items, onItemSelect, onItemNameChange
                     <p className="text-sm text-gray-500 mt-1">Date: {item.transcriptionDate}</p>
                     <p className="text-sm text-gray-700 mt-2">Cost: ${item.cost}</p>
                   </button>
-                  <button
-                    onClick={() => handleEditClick(item)}
-                    className="ml-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                  >
-                    Edit
-                  </button>
+                  <div>
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 mr-2"
+                    >
+                      Edit Name
+                    </button>
+                    <button
+                      onClick={() => onEditSpeakers(item.id)}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      Edit Speakers
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

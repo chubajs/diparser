@@ -32,6 +32,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentCost, setCurrentCost] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [editingSpeakers, setEditingSpeakers] = useState<string | null>(null);
 
   useEffect(() => {
     const storedItems = localStorage.getItem('archiveItems');
@@ -100,6 +101,27 @@ export default function Home() {
     localStorage.setItem('archiveItems', JSON.stringify(updatedItems));
   };
 
+  const handleEditSpeakers = (id: string) => {
+    setEditingSpeakers(id);
+    const item = archiveItems.find(item => item.id === id);
+    if (item) {
+      setTranscription(item.transcript.utterances);
+    }
+  };
+
+  const handleSaveSpeakers = (updatedUtterances: Utterance[]) => {
+    if (editingSpeakers) {
+      const updatedItems = archiveItems.map(item =>
+        item.id === editingSpeakers
+          ? { ...item, transcript: { ...item.transcript, utterances: updatedUtterances } }
+          : item
+      );
+      setArchiveItems(updatedItems);
+      localStorage.setItem('archiveItems', JSON.stringify(updatedItems));
+      setEditingSpeakers(null);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -120,11 +142,16 @@ export default function Home() {
             )}
           </div>
         </div>
-        <TranscriptionDisplay transcription={transcription} />
+        <TranscriptionDisplay
+          transcription={transcription}
+          isEditing={!!editingSpeakers}
+          onSave={handleSaveSpeakers}
+        />
         <Archive
           items={archiveItems}
           onItemSelect={handleArchiveItemSelect}
           onItemNameChange={handleArchiveItemNameChange}
+          onEditSpeakers={handleEditSpeakers}
         />
       </div>
     </main>
